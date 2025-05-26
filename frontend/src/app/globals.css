@@ -1,0 +1,52 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --pastel-lilac: #C8A2C8; /* Lilac */
+  --pastel-light-lilac: #E6D9E6;
+  --pastel-pink: #FFDFD3; /* Light Pink */
+  --pastel-blue: #D3E0FF; /* Light Blue */
+  --pastel-green: #D3FFD3; /* Light Green */
+  --pastel-yellow: #FFFACD; /* Lemon Chiffon (Pastel Yellow) */
+  --text-color: #4A4A4A; /* Bulma's default text color for contrast */
+  --text-color-light: #7A7A7A;
+  --border-color: #DBDBDB; /* Bulma's default border color */
+  --background-color: #F5F5F5; /* Light grey background */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}

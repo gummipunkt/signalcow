@@ -1,0 +1,105 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE / Editor specific
+.idea/
+.vscode/
+*.project
+*.swp
+*~
+
+# Dependency directories
+node_modules/
+/node_modules
+frontend/node_modules/
+backend/node_modules/
+
+# Next.js specific (frontend)
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+frontend/*.tsbuildinfo
+# next-env.d.ts is often committed, but if you prefer to ignore: 
+# frontend/next-env.d.ts
+
+# Backend specific (assuming Node.js, adjust if different)
+# backend/node_modules/ # Already covered by general node_modules/
+backend/.env
+backend/.env.local
+backend/.env.development.local
+backend/.env.test.local
+backend/.env.production.local
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/.pnpm-debug.log*
+# If backend uses a different language/framework, add specific ignores here
+# e.g., for Python:
+# backend/__pycache__/
+# backend/*.py[cod]
+# backend/.venv/
+# backend/venv/
+# backend/env/
+
+# General Build / Output Artifacts
+build/
+/build
+dist/
+/dist
+
+# Log files
+*.log
+logs/
+
+# Coverage reports
+coverage/
+/coverage
+
+# Temporary files / Caches
+.sass-cache/ # if SASS is used directly
+frontend/tmp/
+
+# Secrets / Sensitive files (add any other sensitive files here)
+*.pem
+# .env files are generally good to ignore, handled proyecto specific above
+
+# Bower (if used, legacy)
+# frontend/.bower_components/
+# frontend/bower_components/
+
+# Specific project files/folders to ignore
+.architect # From original .gitignore
+# backend/signalbot/ # From original .gitignore, if it's a generated folder
+# resources/sass/.sass-cache/ # Covered by .sass-cache/
+# resources/.arch-insternal-preview.css # From original .gitignore
+# .arch-internal-preview.css # From original .gitignore
+bmad-agent/ # From original .gitignore
+migrations/ # From original .gitignore, if auto-generated and not versioned
+
+# Yarn / PnP
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# PNPM
+.pnpm-debug.log*
+
+# Vercel (if deploying there)
+.vercel
