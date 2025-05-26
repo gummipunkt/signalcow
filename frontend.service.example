@@ -1,0 +1,32 @@
+[Unit]
+Description=SignalBot Frontend Service
+# Start after the network is available
+After=network.target
+
+[Service]
+# Replace 'your-user' and 'your-group' with the actual user and group
+# that should run this service. It's highly recommended NOT to use root.
+User=your-user
+Group=your-group
+
+# Replace with the actual path to your frontend's root directory on the server
+WorkingDirectory=/srv/signalbot/frontend
+
+# Ensure you have a production build (e.g., 'npm run build' or 'next build')
+# The command to start your frontend. Adjust if necessary.
+# For Next.js, this is typically 'next start -p YOUR_FRONTEND_PORT'
+# Replace YOUR_FRONTEND_PORT with the port your frontend should run on (e.g., 3000)
+# Make sure the path to 'node' and 'next' (or 'npm') are correct for your server environment.
+# Example for Next.js:
+ExecStart=/usr/bin/node node_modules/.bin/next start -p 3000
+# Example for a typical Node.js app using npm start:
+# ExecStart=/usr/bin/npm start
+
+Restart=on-failure
+# Set environment variables, NODE_ENV=production is crucial for performance
+Environment=NODE_ENV=production
+# Add other environment variables your frontend might need
+# Environment="API_URL=http://localhost:YOUR_BACKEND_PORT"
+
+[Install]
+WantedBy=multi-user.target 

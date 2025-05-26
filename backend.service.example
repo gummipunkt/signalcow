@@ -1,0 +1,27 @@
+[Unit]
+Description=SignalBot Backend Service
+# Start after the network is available and potentially after the database
+After=network.target # mysql.service postgresql.service or other DBs
+
+[Service]
+# Replace 'your-user' and 'your-group' with the actual user and group
+User=your-user
+Group=your-group
+
+# Replace with the actual path to your backend's root directory on the server
+WorkingDirectory=/srv/signalbot/backend
+
+# The command to start your backend. Adjust if necessary.
+# Example for a Node.js app started with 'node server.js':
+ExecStart=/usr/bin/node server.js
+# Example for a typical Node.js app using npm start:
+# ExecStart=/usr/bin/npm start
+
+Restart=on-failure
+Environment=NODE_ENV=production
+# Add other environment variables your backend might need
+# Environment="DATABASE_URL=your-db-connection-string"
+# Environment="PORT=YOUR_BACKEND_PORT" # e.g., 8000
+
+[Install]
+WantedBy=multi-user.target 

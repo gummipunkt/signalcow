@@ -150,4 +150,85 @@ Details on contributing, coding standards, and submitting pull requests will be 
 
 ## License
 
-This project is licensed under the [GNU General Public License v3.0](./LICENSE). 
+This project is licensed under the [GNU General Public License v3.0](./LICENSE).
+
+## Deploying with systemd (Linux)
+
+To run the frontend, backend, and signal-cli services persistently on a Linux server (e.g., Ubuntu), using `systemd` is a recommended approach. This allows the services to start on boot, restart on failure, and manage logging.
+
+Example `systemd` unit files are provided in the root of this repository:
+*   `frontend.service.example`
+*   `backend.service.example`
+*   `signal-cli.service.example`
+
+**General Steps for each service:**
+
+1.  **Copy the Example File:**
+    Copy the relevant example file (e.g., `frontend.service.example`) to `/etc/systemd/system/frontend.service` (adjusting the target filename as needed, e.g., `signalbot-frontend.service`).
+    ```bash
+    sudo cp frontend.service.example /etc/systemd/system/frontend.service
+    ```
+
+2.  **Edit the Service File:**
+    Open the new service file with a text editor (e.g., `sudo nano /etc/systemd/system/frontend.service`) and **carefully review and update all paths and settings** according to your server environment:
+    *   `User` and `Group`: Set to a non-privileged user that will run the service.
+    *   `WorkingDirectory`: Set to the absolute path where the service's code (e.g., frontend, backend) is located on your server (e.g., `/srv/signalbot/frontend`).
+    *   `ExecStart`:
+        *   Ensure the command and any paths to executables (like `node`, `npm`, `next`, `signal-cli`) are correct for your server.
+        *   For `frontend.service`, ensure you have a production build (e.g., `npm run build`) and update the port if needed.
+        *   For `signal-cli.service`, **crucially update** `/PATH_TO_YOUR/signal-cli`, `/PATH_TO_YOUR_SIGNAL_CONFIG_DIR`, and `+YOUR_SIGNAL_NUMBER`. The config directory for `signal-cli` on Linux is often `~/.config/signal-cli` for a user or a system-wide path like `/opt/signal-cli/data` or `/etc/signal-cli/data` depending on your installation method.
+    *   `Environment`: Set necessary environment variables (e.g., `NODE_ENV=production`, `DATABASE_URL`, `PORTs`).
+
+3.  **Reload systemd Daemon:**
+    After creating or modifying a service file, tell systemd to reload its configuration:
+    ```bash
+    sudo systemctl daemon-reload
+    ```
+
+4.  **Enable the Service (to start on boot):**
+    ```bash
+    sudo systemctl enable frontend.service
+    ```
+    (Use the actual filename you chose, e.g., `signalbot-frontend.service`)
+
+5.  **Start the Service Manually:**
+    ```bash
+    sudo systemctl start frontend.service
+    ```
+
+6.  **Check the Service Status:**
+    ```bash
+    sudo systemctl status frontend.service
+    ```
+    This will show if the service is active (running) and display recent log entries. Look for any errors.
+
+7.  **View Logs:**
+    To view more detailed logs or follow them live:
+    ```bash
+    journalctl -u frontend.service
+    journalctl -u frontend.service -f # Follow live logs
+    ```
+
+**Important Considerations:**
+
+*   **Permissions:** Ensure the user specified in the service file has the necessary read/write/execute permissions for the `WorkingDirectory`, any config files, and log directories.
+*   **Firewall:** Make sure any ports your services listen on (e.g., frontend port, backend port, `signal-cli` port 7446) are opened in your server's firewall (e.g., `ufw`).
+    Example for `ufw`:
+    ```bash
+    sudo ufw allow 3000/tcp # Example for frontend
+    sudo ufw allow 8000/tcp # Example for backend
+    sudo ufw allow 7446/tcp # For signal-cli
+    sudo ufw enable
+    sudo ufw status
+    ```
+*   **Production Builds:** Always use production builds for your frontend and backend services for better performance and security.
+*   **Database Service:** If your backend depends on a database, ensure the database service (e.g., `postgresql.service`) is started before your backend. You can add it to the `After=` and `Wants=` directives in your `backend.service` file:
+    ```systemd
+    [Unit]
+    Description=My Backend Service
+    After=network.target postgresql.service
+    Wants=postgresql.service
+    ...
+    ```
+
+Repeat these steps for `backend.service` and `signal-cli.service`, adjusting names and paths accordingly. 

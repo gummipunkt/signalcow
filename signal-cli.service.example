@@ -1,0 +1,29 @@
+[Unit]
+Description=signal-cli Daemon Service
+# Start after the network is available
+After=network.target
+
+[Service]
+# It is STRONGLY recommended to run signal-cli as its own dedicated, non-privileged user.
+# Replace 'signal-cli-user' and 'signal-cli-group' accordingly.
+User=signal-cli-user
+Group=signal-cli-group
+
+# WorkingDirectory is usually not critical for signal-cli daemon, 
+# but can be set to the user's home or a dedicated directory.
+# WorkingDirectory=/home/signal-cli-user
+
+# IMPORTANT: Adjust paths for your Ubuntu server installation!
+# - Replace '/PATH_TO_YOUR/signal-cli' with the actual path to the signal-cli executable.
+#   (e.g., /usr/local/bin/signal-cli or /opt/signal-cli/bin/signal-cli)
+# - Replace '/PATH_TO_YOUR_SIGNAL_CONFIG_DIR' with your signal-cli config/data directory.
+#   (e.g., /home/signal-cli-user/.config/signal-cli, /etc/signal-cli/data, or /opt/signal-cli/data)
+# - Replace '+YOUR_SIGNAL_NUMBER' with your actual registered signal number (e.g. +4915678470953)
+ExecStart=/PATH_TO_YOUR/signal-cli --config /PATH_TO_YOUR_SIGNAL_CONFIG_DIR -u +YOUR_SIGNAL_NUMBER daemon --tcp 0.0.0.0:7446
+
+Restart=on-failure
+# If signal-cli takes a long time to start, you might increase the timeout
+# TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target 
