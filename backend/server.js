@@ -8,7 +8,7 @@ const groupRoutes = require('./routes/groupRoutes'); // Temporarily commented ou
 const webhookRoutes = require('./routes/webhookRoutes'); // Temporarily commented out
 
 const app = express();
-const port = process.env.BACKEND_PORT || 3001;
+const port = process.env.PORT || 3001;
 
 // Middleware for parsing JSON bodies (global for the app)
 app.use(express.json());

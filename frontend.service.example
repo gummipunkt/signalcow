@@ -18,7 +18,7 @@ WorkingDirectory=/srv/signalbot/frontend
 # Replace YOUR_FRONTEND_PORT with the port your frontend should run on (e.g., 3000)
 # Make sure the path to 'node' and 'next' (or 'npm') are correct for your server environment.
 # Example for Next.js:
-ExecStart=/usr/bin/node node_modules/.bin/next start -p 3000
+ExecStart=/usr/bin/node node_modules/.bin/next start
 # Example for a typical Node.js app using npm start:
 # ExecStart=/usr/bin/npm start
 
