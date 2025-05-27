@@ -65,16 +65,36 @@ signalcow/
     *   Navigate to the `backend` directory: `cd backend`
     *   Install dependencies: `npm install` (or `yarn install`)
     *   Create a `.env` file by copying `../.env.example` (from the project root) to this directory (`backend/.env`).
-        *   Update `DATABASE_URL` (e.g., `postgresql://user:password@host:port/database_name`)
+        *   Update `DATABASE_URL` to point to your PostgreSQL database. This is crucial. Example: `postgresql://your_db_user:your_db_password@localhost:5432/signalbot_db`
         *   Set `JWT_SECRET` to a long, random string.
         *   Set `BOT_NUMBER` to the phone number your `signal-cli` instance is using (e.g., `+1234567890`).
-        *   Set `SIGNAL_CLI_REST_API_URL` (e.g., `http://localhost:8080`).
-        *   Set `BASE_URL` for constructing webhook URLs (e.g., `http://localhost:3000` if your backend runs on port 3000).
-    *   Ensure your PostgreSQL server is running and the specified database exists. If not, create it.
-    *   Run database migrations: `npm run migrate up`
-        *   This uses `node-pg-migrate` and the migration files in the root `migrations/` directory.
+        *   Set `SIGNAL_CLI_REST_API_URL` (e.g., `http://localhost:8080` if `signal-cli` runs on the same machine with default port, or the appropriate URL if `signal-cli` uses a different port or host, like `http://localhost:7446` if using the port from the `signal-cli.service.example`).
+        *   Set `BASE_URL` for constructing webhook URLs (e.g., `http://yourdomain.com` or `http://localhost:PORT_YOUR_BACKEND_RUNS_ON`).
+    *   **Database Setup (PostgreSQL):**
+        *   Ensure you have a PostgreSQL server installed and running.
+        *   You need to create a dedicated database and a user for the application. You can do this using `psql` or a database management tool.
+            *   Example using `psql` (connect as a superuser, e.g., `postgres`):
+                ```sql
+                -- Connect to PostgreSQL
+                -- sudo -u postgres psql
+
+                CREATE DATABASE signalbot_db;
+                CREATE USER signalbot_user WITH PASSWORD 'your_secure_password';
+                GRANT ALL PRIVILEGES ON DATABASE signalbot_db TO signalbot_user;
+                -- Optionally, if you want the user to be able to create tables etc. within a specific schema or the public schema:
+                -- \c signalbot_db
+                -- GRANT ALL ON SCHEMA public TO signalbot_user;
+                ```
+            *   Make sure the `DATABASE_URL` in your `backend/.env` file matches the database name, user, password, host, and port you configured.
+    *   **Run Database Migrations:**
+        *   Once the database is created and the `.env` file is configured, navigate to the `backend/` directory (if not already there).
+        *   Run the following command to create the necessary tables and schema in your database:
+            ```bash
+            npm run migrate up
+            ```
+        *   This command uses `node-pg-migrate` and executes the migration files located in the project's root `migrations/` directory (e.g., `migrations/001_initial_schema.js`). This step is essential for the application to function correctly.
     *   Start the backend server: `npm start`
-        *   The backend typically runs on `http://localhost:3000`.
+        *   The backend typically runs on `http://localhost:3000` or the port specified in your `.env` (e.g., via a `PORT` variable if your `server.js` uses it). Check your terminal output and `.env` configuration.
 
 3.  **Frontend Setup (`frontend/`):**
     *   Navigate to the `frontend` directory: `cd ../frontend` (from `backend/`) or `cd frontend` (from project root).
