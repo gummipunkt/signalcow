@@ -1,4 +1,5 @@
-require('dotenv').config(); // Loads environment variables from .env
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const express = require('express');
 const pool = require('./config/db'); // Imports the DB pool
@@ -8,6 +9,7 @@ const groupRoutes = require('./routes/groupRoutes'); // Temporarily commented ou
 const webhookRoutes = require('./routes/webhookRoutes'); // Temporarily commented out
 
 const app = express();
+
 const port = process.env.PORT || 3001;
 
 // Middleware for parsing JSON bodies (global for the app)
