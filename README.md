@@ -1,12 +1,13 @@
 # Signalcow Webhook Platform
 
-This project provides a web-based platform to manage and interact with Signal messenger bots. It allows users to register, create groups that correspond to Signal groups, and configure webhooks to send messages to these groups via a REST API. The first registered user automatically gains administrative privileges to manage users, groups, and webhooks directly within the frontend interface.
+This project provides a web-based platform to create, manage and interact with Webhooks for Signal. It allows users to register, create groups, and configure webhooks to send messages to groups via signal-cli. The first registered user automatically gains administrative privileges to manage users, groups, and webhooks directly within the frontend interface.
+Automatic Signal group linking, there's no need for a difficult solution.
 
 ## Core Features
 
 *   **User Authentication:** Secure registration and login for users using JWT.
 *   **Automated Admin Assignment:** The first user to register on the platform automatically becomes an administrator.
-*   **Group Management:** Users can create, view, edit, and delete "groups" within the platform. Each group is intended to be linked to a Signal group.
+*   **Group Management:** Users can create, view, edit, and delete "groups" within the platform.
 *   **Bot Linking Mechanism:** Functionality to generate a link token for associating a bot (running via `signal-cli`) with a platform group and a Signal group.
 *   **Webhook Management:**
     *   Create unique webhooks for each group.
@@ -26,8 +27,7 @@ This project provides a web-based platform to manage and interact with Signal me
 
 *   **Node.js and npm/yarn:** For both backend and frontend.
 *   **PostgreSQL Server:** Running and accessible.
-*   **`signal-cli`:** Installed, configured with a dedicated bot phone number, and running. The API should be accessible by the backend (default: `http://localhost:8080`).
-*   **Git:** For version control.
+*   **`signal-cli`:** Installed, configured with a dedicated bot phone number, and running. The API should be accessible by the backend.
 
 ## Project Structure
 
@@ -176,13 +176,6 @@ All API endpoints are prefixed with `/api`. Authentication is required for most 
 *   **Webhook (Public Message Receiver):**
     *   `POST /webhook/:webhookToken` (Receives a message to be sent to a Signal group)
 
-## Admin Routes (Backend) - Deprecated
-
-This section is deprecated. The previous Basic Auth protected HTML admin pages under `/admin/*` have been replaced by the JWT-protected JSON API endpoints under `/api/admin/*` and the integrated frontend admin interface.
-
-## Contributing
-
-Details on contributing, coding standards, and submitting pull requests will be added here.
 
 ## License
 
@@ -197,6 +190,10 @@ Example `systemd` unit files are provided in the root of this repository:
 *   `backend.service.example`
 *   `signal-cli.service.example`
 
+## Deploying with nginx
+Please see nginx.vhost.example.conf
+
+
 **General Steps for each service:**
 
 1.  **Copy the Example File:**
@@ -206,7 +203,7 @@ Example `systemd` unit files are provided in the root of this repository:
     ```
 
 2.  **Edit the Service File:**
-    Open the new service file with a text editor (e.g., `sudo nano /etc/systemd/system/frontend.service`) and **carefully review and update all paths and settings** according to your server environment:
+    Open the new service file with a text editor (e.g., `sudo vim /etc/systemd/system/frontend.service`) and **carefully review and update all paths and settings** according to your server environment:
     *   `User` and `Group`: Set to a non-privileged user that will run the service.
     *   `WorkingDirectory`: Set to the absolute path where the service's code (e.g., frontend, backend) is located on your server (e.g., `/srv/signalbot/frontend`).
     *   `ExecStart`:
@@ -248,7 +245,7 @@ Example `systemd` unit files are provided in the root of this repository:
 **Important Considerations:**
 
 *   **Permissions:** Ensure the user specified in the service file has the necessary read/write/execute permissions for the `WorkingDirectory`, any config files, and log directories.
-*   **Firewall:** Make sure any ports your services listen on (e.g., frontend port, backend port, `signal-cli` port 7446) are opened in your server's firewall (e.g., `ufw`).
+*   **Firewall:** Make sure any ports your services listen on (e.g., frontend port, backend port, `signal-cli` port 7446) are opened in your server's firewall (e.g., `ufw`) if you don't use a webserver and reverse proxy.
     Example for `ufw`:
     ```bash
     sudo ufw allow 3000/tcp # Example for frontend
@@ -257,7 +254,7 @@ Example `systemd` unit files are provided in the root of this repository:
     sudo ufw enable
     sudo ufw status
     ```
-*   **Production Builds:** Always use production builds for your frontend and backend services for better performance and security.
+*   **Production Builds:** Always use production builds for your frontend and backend services for better performance and security. Run in /frontend `npx build`.
 *   **Database Service:** If your backend depends on a database, ensure the database service (e.g., `postgresql.service`) is started before your backend. You can add it to the `After=` and `Wants=` directives in your `backend.service` file:
     ```systemd
     [Unit]
@@ -267,4 +264,4 @@ Example `systemd` unit files are provided in the root of this repository:
     ...
     ```
 
-Repeat these steps for `backend.service` and `signal-cli.service`, adjusting names and paths accordingly. 
+Repeat these steps for `backend.service`, adjusting names and paths accordingly. 
