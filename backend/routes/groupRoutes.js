@@ -4,6 +4,150 @@ const crypto = require("crypto");
 const pool = require("../config/db");
 const { authenticateToken } = require("../middleware/authMiddleware"); // Applied to the entire router instance in server.js
 
+/**
+ * @swagger
+ * tags:
+ *   name: Groups
+ *   description: Group management for authenticated users
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Group:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: The auto-generated id of the group.
+ *         user_id:
+ *           type: string
+ *           format: uuid
+ *           description: The id of the user who owns the group.
+ *         group_name:
+ *           type: string
+ *           description: Name of the group.
+ *         description:
+ *           type: string
+ *           nullable: true
+ *           description: Optional description for the group.
+ *         signal_group_id:
+ *           type: string
+ *           nullable: true
+ *           description: Internal ID of the linked Signal group (if any).
+ *         link_token:
+ *           type: string
+ *           nullable: true
+ *           description: Token used for linking with a Signal group.
+ *         link_token_expires_at:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *           description: Expiration timestamp for the link_token.
+ *         bot_linked_at:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *           description: Timestamp when the bot was successfully linked.
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of group creation.
+ *       example:
+ *         id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+ *         user_id: "b2c3d4e5-f6a7-8901-2345-678901bcdef0"
+ *         group_name: "My Test Group"
+ *         description: "This is a group for testing purposes."
+ *         signal_group_id: "signalgroupid=="
+ *         link_token: null
+ *         link_token_expires_at: null
+ *         bot_linked_at: "2023-05-15T10:30:00Z"
+ *         created_at: "2023-05-15T09:00:00Z"
+ *     Webhook:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the webhook.
+ *         group_id:
+ *           type: string
+ *           format: uuid
+ *           description: The id of the group this webhook belongs to.
+ *         webhook_token:
+ *           type: string
+ *           description: The unique token for this webhook.
+ *         description:
+ *           type: string
+ *           nullable: true
+ *           description: Optional description for the webhook.
+ *         is_active:
+ *           type: boolean
+ *           description: Whether the webhook is currently active.
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of webhook creation.
+ *         webhook_url:
+ *           type: string
+ *           format: url
+ *           description: The full URL to call this webhook (returned on creation).
+ *       example:
+ *         id: 1
+ *         group_id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+ *         webhook_token: "f4df29f92879798a8e20470e5051555ac65dbee667af0a5f"
+ *         description: "Order notifications webhook"
+ *         is_active: true
+ *         created_at: "2023-05-16T11:00:00Z"
+ *         webhook_url: "http://localhost:3002/webhook/f4df29f92879798a8e20470e5051555ac65dbee667af0a5f"
+ *     NewGroup:
+ *       type: object
+ *       required:
+ *         - group_name
+ *       properties:
+ *         group_name:
+ *           type: string
+ *           description: Name for the new group.
+ *           example: "Marketing Team"
+ *         description:
+ *           type: string
+ *           nullable: true
+ *           description: Optional description for the new group.
+ *           example: "Group for all marketing related communications"
+ *     NewWebhook:
+ *       type: object
+ *       properties:
+ *         description:
+ *           type: string
+ *           nullable: true
+ *           description: Optional description for the new webhook.
+ *           example: "Notify on new leads"
+ */
+
+/**
+ * @swagger
+ * /api/groups:
+ *   get:
+ *     summary: Lists all groups for the authenticated user
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of groups.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Group'
+ *       401:
+ *         description: Unauthorized (token missing or invalid)
+ *       500:
+ *         description: Error fetching groups
+ */
+
 // List all groups of the authenticated user
 router.get("/", async (req, res) => {
   const userId = req.user.id; // Set by authenticateToken middleware in server.js
@@ -24,6 +168,37 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching groups." });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{groupId}:
+ *   get:
+ *     summary: Get a specific group by ID
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group to retrieve.
+ *     responses:
+ *       200:
+ *         description: Details of the group.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Group'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: Error fetching group.
+ */
 
 // Get a specific group of the authenticated user
 router.get("/:groupId", async (req, res) => {
@@ -51,6 +226,53 @@ router.get("/:groupId", async (req, res) => {
     res.status(500).json({ message: "Error fetching group." });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{groupId}/link-token:
+ *   post:
+ *     summary: Generate a new link token for a group to connect with Signal.
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group for which to generate a link token.
+ *     responses:
+ *       200:
+ *         description: Link token generated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Link token generated successfully.
+ *                 linkToken:
+ *                   type: string
+ *                   example: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"
+ *                 botNumber:
+ *                   type: string
+ *                   example: "+12345678900"
+ *                 groupName:
+ *                   type: string
+ *                   example: "My Test Group"
+ *                 expiresAt:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: Server configuration error or internal server error generating link token.
+ */
 
 // Route to generate a link token for a group
 router.post("/:groupId/link-token", async (req, res) => {
@@ -131,6 +353,35 @@ router.post("/:groupId/link-token", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/groups:
+ *   post:
+ *     summary: Create a new group
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewGroup'
+ *     responses:
+ *       201:
+ *         description: Group created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Group'
+ *       400:
+ *         description: Group name is required.
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Error creating group.
+ */
+
 // Standard CRUD routes for groups
 
 // Create group
@@ -157,6 +408,45 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "Error creating group." });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{groupId}:
+ *   put:
+ *     summary: Update an existing group
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewGroup' # Can reuse NewGroup if fields are the same for update
+ *     responses:
+ *       200:
+ *         description: Group updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Group'
+ *       400:
+ *         description: Group name is required.
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: Error updating group.
+ */
 
 // Update group (only name and description)
 router.put("/:groupId", async (req, res) => {
@@ -191,6 +481,41 @@ router.put("/:groupId", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/groups/{groupId}:
+ *   delete:
+ *     summary: Delete a group and its associated webhooks
+ *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group to delete.
+ *     responses:
+ *       200:
+ *         description: Group and associated webhooks deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Group and associated webhooks deleted successfully.
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: An unexpected error occurred while deleting the group.
+ */
+
 // Delete group
 router.delete("/:groupId", async (req, res) => {
   const { groupId } = req.params;
@@ -222,6 +547,39 @@ router.delete("/:groupId", async (req, res) => {
     res.status(500).json({ message: errorMessage });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{groupId}/webhooks:
+ *   get:
+ *     summary: List all webhooks for a specific group
+ *     tags: [Groups, Webhooks] # Added Webhooks tag as well
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group whose webhooks to retrieve.
+ *     responses:
+ *       200:
+ *         description: A list of webhooks for the group.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Webhook' 
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: Error fetching webhooks for the group.
+ */
 
 router.get("/:groupId/webhooks", async (req, res) => {
   const { groupId } = req.params;
@@ -268,6 +626,43 @@ router.get("/:groupId/webhooks", async (req, res) => {
     res.status(500).json({ message: "Error fetching webhooks for the group." });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{groupId}/webhooks:
+ *   post:
+ *     summary: Create a new webhook for a specific group
+ *     tags: [Groups, Webhooks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: The ID of the group for which to create a webhook.
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewWebhook'
+ *     responses:
+ *       201:
+ *         description: Webhook created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Webhook' # Returns the full webhook object including URL
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Group not found or access denied.
+ *       500:
+ *         description: Server configuration error or internal server error creating webhook.
+ */
 
 // Create webhook for a group
 router.post("/:groupId/webhooks", async (req, res) => {

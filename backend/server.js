@@ -8,12 +8,53 @@ const { authenticateToken } = require('./middleware/authMiddleware');
 const groupRoutes = require('./routes/groupRoutes'); // Temporarily commented out
 const webhookRoutes = require('./routes/webhookRoutes'); // Temporarily commented out
 
+// Swagger / OpenAPI
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 const app = express();
 
 const port = process.env.PORT || 3001;
 
 // Middleware for parsing JSON bodies (global for the app)
 app.use(express.json());
+
+// Swagger/OpenAPI Configuration
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0', // Specification (optional, defaults to swagger: '2.0')
+    info: {
+      title: 'Signalcow Backend API',
+      version: '1.0.0',
+      description: 'API documentation for the Signalcow backend services',
+    },
+    servers: [ // Optional: Define your server URL
+      {
+        url: `http://localhost:${port}`, // Adjust if your server runs elsewhere or on HTTPS
+        description: 'Development server'
+      }
+    ],
+    // Optional: Add components like securitySchemes for JWT
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        }
+      }
+    },
+    security: [{ // Optional: Apply security globally
+      bearerAuth: []
+    }]
+  },
+  // Path to the API docs
+  // Note: glob pattern might need adjustment based on your project structure
+  apis: ['./routes/*.js'], // Glob pattern to find API docs in JSDoc format
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Test database connection (optional)
 async function testDbConnection() {

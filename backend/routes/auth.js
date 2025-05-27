@@ -9,7 +9,76 @@ const pool = require('../config/db'); // Imports the DB pool
 // e.g., router.post('/register', ...);
 // router.post('/login', ...);
 
-// Registration endpoint: POST /api/auth/register
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: User authentication and registration
+ */
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registers a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Desired username for the new user.
+ *                 example: johndoe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address for the new user.
+ *                 example: john.doe@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: Password for the new user (min 6 characters recommended).
+ *                 example: Str0ngP@sswOrd
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User registered successfully.
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                     is_admin:
+ *                       type: boolean
+ *       400:
+ *         description: Username, email, and password are required.
+ *       409:
+ *         description: User with this email or username already exists.
+ *       500:
+ *         description: Internal server error during registration.
+ */
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -53,7 +122,62 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login endpoint: POST /api/auth/login
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Logs in a user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john.doe@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Str0ngP@sswOrd
+ *     responses:
+ *       200:
+ *         description: Login successful, returns JWT token and user object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged in successfully.
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     email:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     is_admin:
+ *                       type: boolean
+ *       400:
+ *         description: Email and password are required.
+ *       401:
+ *         description: Invalid credentials.
+ *       500:
+ *         description: Internal server error during login or JWT_SECRET not configured.
+ */
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
