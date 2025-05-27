@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npx dotenv-cli next dev",
     "build": "next build",
-    "start": "dotenv next start",
+    "start": "npx dotenv-cli -- next start",
     "lint": "next lint"
   },
   "dependencies": {
