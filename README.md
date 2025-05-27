@@ -92,7 +92,23 @@ signalcow/
             ```bash
             npm run migrate up
             ```
-        *   This command uses `node-pg-migrate` and executes the migration files located in the project's root `migrations/` directory (e.g., `migrations/001_initial_schema.js`). This step is essential for the application to function correctly.
+        *   This command uses `node-pg-migrate` and executes the migration files located in the project\'s root `migrations/` directory (e.g., `migrations/001_initial_schema.js`). This step is essential for the application to function correctly.
+        *   **Troubleshooting Migrations:**
+            *   **Naming Convention:** `node-pg-migrate` works best when migration files start with a timestamp (e.g., `1622548800000_initial_schema.js`). To generate a new migration file with the correct naming convention, use:
+                ```bash
+                npm run migrate:create descriptive_migration_name
+                ```
+                Then, add your schema changes to the `up` (and `down`) functions in the newly generated file.
+            *   **`Can't determine timestamp` or `No migrations to run!` errors:** This often indicates an issue with the migration filename not matching the expected format, or `node-pg-migrate` thinking a migration has already run (check the `pgmigrations` table in your database). Renaming the file to include a timestamp or creating a new one as described above usually resolves this. You can inspect the `pgmigrations` table in your database (e.g., `SELECT * FROM pgmigrations;` in `psql`) to see which migrations `node-pg-migrate` considers applied.
+            *   **`MODULE_TYPELESS_PACKAGE_JSON` Warning:** You might see a Node.js warning about module types if your migration file uses ES Module syntax but your `backend/package.json` does not specify `"type": "module"`. As long as the migration completes successfully, this warning can often be ignored. To resolve it, ensure your migration files use CommonJS syntax (e.g., `exports.up = ...`) or add `"type": "module"` to `backend/package.json` (this will affect all `.js` files in the backend project).
+            *   **Verify Schema:** After running `npm run migrate up` successfully, it is crucial to connect to your PostgreSQL database (e.g., using `psql`) and verify that the tables and columns were created as expected. For example:
+                ```bash
+                # Connect to your database, then:
+                \dt # List all tables
+                \d users # Describe the 'users' table to check its columns
+                \d groups # Describe the 'groups' table
+                # etc. for other tables
+                ```
     *   Start the backend server: `npm start`
         *   The backend typically runs on `http://localhost:3000` or the port specified in your `.env` (e.g., via a `PORT` variable if your `server.js` uses it). Check your terminal output and `.env` configuration.
 
