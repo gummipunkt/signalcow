@@ -2,7 +2,9 @@
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
-  // Users table
+  console.log('[MIGRATE UP] Starting migration 1748330134341_initial-schema-v2...');
+
+  console.log('[MIGRATE UP] Attempting to create users table...');
   pgm.createTable('users', {
     id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
     username: { type: 'varchar(255)', notNull: true, unique: true },
@@ -20,8 +22,9 @@ exports.up = (pgm) => {
       default: pgm.func('current_timestamp'),
     },
   });
+  console.log('[MIGRATE UP] Users table creation attempted.');
 
-  // Groups table
+  console.log('[MIGRATE UP] Attempting to create groups table...');
   pgm.createTable('groups', {
     id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
     user_id: {
@@ -49,9 +52,9 @@ exports.up = (pgm) => {
   });
   // Index for faster lookups on user_id in groups table
   pgm.createIndex('groups', 'user_id');
+  console.log('[MIGRATE UP] Groups table creation attempted.');
 
-
-  // Webhooks table
+  console.log('[MIGRATE UP] Attempting to create webhooks table...');
   pgm.createTable('webhooks', {
     id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
     group_id: {
@@ -73,6 +76,7 @@ exports.up = (pgm) => {
   pgm.createIndex('webhooks', 'group_id');
   // Index for faster lookups on webhook_token
   pgm.createIndex('webhooks', 'webhook_token');
+  console.log('[MIGRATE UP] Webhooks table creation attempted.');
 
   // Optional: Trigger to update 'updated_at' timestamp on row update for all tables
   // This requires creating a function first.
@@ -95,9 +99,13 @@ exports.up = (pgm) => {
       EXECUTE PROCEDURE update_updated_at_column();
     `);
   });
+  console.log('[MIGRATE UP] Indexes/triggers creation attempted.');
+
+  console.log('[MIGRATE UP] Migration 1748330134341_initial-schema-v2 finished.');
 };
 
 exports.down = (pgm) => {
+  console.log('[MIGRATE DOWN] Starting DOWN migration 1748330134341_initial-schema-v2...');
   // Drop tables in reverse order of creation due to foreign key constraints
   // First drop triggers if they exist
   const tablesWithUpdatedAt = ['users', 'groups', 'webhooks'];
@@ -110,4 +118,5 @@ exports.down = (pgm) => {
   pgm.dropTable('webhooks');
   pgm.dropTable('groups');
   pgm.dropTable('users');
+  console.log('[MIGRATE DOWN] DOWN migration 1748330134341_initial-schema-v2 finished.');
 };
