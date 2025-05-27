@@ -51,16 +51,22 @@ export default function NewGroupPage() {
         }),
       });
 
-      const responseData: Group = await response.json();
-
       if (!response.ok) {
-        throw new Error(responseData.message || 'Error creating group');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error creating group');
       }
       
+      const responseData: Group = await response.json();
       router.push(`/dashboard/groups/${responseData.id}/edit`);
       
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while creating the group.');
+      }
     } finally {
       setIsSubmitting(false);
     }

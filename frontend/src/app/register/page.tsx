@@ -22,7 +22,7 @@ export default function RegisterPage() {
     if (error) {
         setError(null);
     }
-  }, [isAuthenticated, isLoading, router, setError]);
+  }, [isAuthenticated, isLoading, router, setError, error]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

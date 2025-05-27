@@ -73,8 +73,14 @@ export default function DashboardPage() {
           }
           setTotalWebhooks(webhooksCount);
 
-        } catch (err: any) {
-          setDataError(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setDataError(err.message);
+          } else if (typeof err === 'string') {
+            setDataError(err);
+          } else {
+            setDataError('An unexpected error occurred while fetching dashboard data.');
+          }
         } finally {
           setIsLoadingData(false);
         }
@@ -133,26 +139,26 @@ export default function DashboardPage() {
           <div id="webhook-guide-content" className="content mt-3">
             <ol style={{ color: 'var(--text-color)' }}>
               <li className="mb-3">
-                <strong style={{ color: 'var(--pastel-lilac)' }}>1. Navigate to the "Groups" section:</strong>
-                <p>Click on the "Groups" menu item in the navigation bar.</p>
+                <strong style={{ color: 'var(--pastel-lilac)' }}>1. Navigate to the &quot;Groups&quot; section:</strong>
+                <p>Click on the &quot;Groups&quot; menu item in the navigation bar.</p>
               </li>
               <li className="mb-3">
                 <strong style={{ color: 'var(--pastel-lilac)' }}>2. Select a group or create a new one:</strong>
                 <p>You will see a list of your existing groups. You can select one for which you want to create a webhook, or create a new group.</p>
               </li>
               <li className="mb-3">
-                <strong style={{ color: 'var(--pastel-lilac)' }}>3. Access the group's webhook management:</strong>
-                <p>Within the detail view of a group, you will find options to manage webhooks (e.g., a tab or a button "Manage Webhooks").</p>
+                <strong style={{ color: 'var(--pastel-lilac)' }}>3. Access the group&apos;s webhook management:</strong>
+                <p>Within the detail view of a group, you will find options to manage webhooks (e.g., a tab or a button &quot;Manage Webhooks&quot;).</p>
               </li>
               <li className="mb-3">
                 <strong style={{ color: 'var(--pastel-lilac)' }}>4. Create a new webhook:</strong>
-                <p>Click on "Create New Webhook". A form will open.</p>
+                <p>Click on &quot;Create New Webhook&quot;. A form will open.</p>
               </li>
               <li className="mb-3">
                 <strong style={{ color: 'var(--pastel-lilac)' }}>5. Configure the webhook:</strong>
                 <ul className="list" style={{ marginLeft: '1.5em', listStyleType: 'disc', paddingLeft: '20px' }}>
                   <li><strong>Name:</strong> Enter a descriptive name for your webhook.</li>
-                  <li><strong>Event Type:</strong> Choose the event that should trigger the webhook (e.g., "New message received", "Member joined").</li>
+                  <li><strong>Event Type:</strong> Choose the event that should trigger the webhook (e.g., &quot;New message received&quot;, &quot;Member joined&quot;).</li>
                   <li><strong>Target URL:</strong> Enter the URL of your service that will receive the webhook data. This URL must be publicly accessible.</li>
                   <li><strong>(Optional) Secret Key:</strong> For added security, you can specify a secret key. This will be used to sign the requests so your service can verify their authenticity.</li>
                 </ul>

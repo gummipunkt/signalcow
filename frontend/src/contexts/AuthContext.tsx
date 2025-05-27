@@ -83,8 +83,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(data.token);
       setUser(data.user as User); 
       router.push('/dashboard'); 
-    } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'An error occurred.');
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred during login.');
+      }
       localStorage.removeItem('authToken');
       localStorage.removeItem('authUser');
       setToken(null);
@@ -109,8 +115,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(data.message || 'Registration failed');
       }
       router.push('/login?registered=true'); 
-    } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'An error occurred.');
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred during registration.');
+      }
     } finally {
       setIsLoading(false);
     }

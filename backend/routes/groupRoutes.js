@@ -13,8 +13,14 @@ router.get("/", async (req, res) => {
       [userId],
     );
     res.json(result.rows);
-  } catch (error) {
-    console.error("[GET /api/groups] Error fetching groups:", error);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error("[GET /api/groups] Error fetching groups:", err.message);
+    } else if (typeof err === 'string') {
+      console.error("[GET /api/groups] Error fetching groups:", err);
+    } else {
+      console.error("[GET /api/groups] Error fetching groups: An unexpected error occurred");
+    }
     res.status(500).json({ message: "Error fetching groups." });
   }
 });
@@ -34,8 +40,14 @@ router.get("/:groupId", async (req, res) => {
         .json({ message: "Group not found or access denied." });
     }
     res.json(result.rows[0]);
-  } catch (error) {
-    console.error(`[GET /api/groups/${groupId}] Error fetching group:`, error);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(`[GET /api/groups/${groupId}] Error fetching group:`, err.message);
+    } else if (typeof err === 'string') {
+      console.error(`[GET /api/groups/${groupId}] Error fetching group:`, err);
+    } else {
+      console.error(`[GET /api/groups/${groupId}] Error fetching group: An unexpected error occurred`);
+    }
     res.status(500).json({ message: "Error fetching group." });
   }
 });
@@ -97,11 +109,22 @@ router.post("/:groupId/link-token", async (req, res) => {
       groupName: groupName,
       expiresAt: expiresAt.toISOString(),
     });
-  } catch (error) {
-    console.error(
-      `[POST /:groupId/link-token] Error generating link token for group ${groupId}:`,
-      error,
-    );
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(
+        `[POST /:groupId/link-token] Error generating link token for group ${groupId}:`,
+        err.message,
+      );
+    } else if (typeof err === 'string') {
+      console.error(
+        `[POST /:groupId/link-token] Error generating link token for group ${groupId}:`,
+        err,
+      );
+    } else {
+      console.error(
+        `[POST /:groupId/link-token] Error generating link token for group ${groupId}: An unexpected error occurred`,
+      );
+    }
     res
       .status(500)
       .json({ message: "Internal server error generating link token." });
@@ -123,8 +146,14 @@ router.post("/", async (req, res) => {
       [userId, group_name, description || null],
     );
     res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("[POST /api/groups] Error creating group:", error);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error("[POST /api/groups] Error creating group:", err.message);
+    } else if (typeof err === 'string') {
+      console.error("[POST /api/groups] Error creating group:", err);
+    } else {
+      console.error("[POST /api/groups] Error creating group: An unexpected error occurred");
+    }
     res.status(500).json({ message: "Error creating group." });
   }
 });
@@ -150,8 +179,14 @@ router.put("/:groupId", async (req, res) => {
         .json({ message: "Group not found or access denied." });
     }
     res.json(result.rows[0]);
-  } catch (error) {
-    console.error(`[PUT /api/groups/${groupId}] Error updating group:`, error);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(`[PUT /api/groups/${groupId}] Error updating group:`, err.message);
+    } else if (typeof err === 'string') {
+      console.error(`[PUT /api/groups/${groupId}] Error updating group:`, err);
+    } else {
+      console.error(`[PUT /api/groups/${groupId}] Error updating group: An unexpected error occurred`);
+    }
     res.status(500).json({ message: "Error updating group." });
   }
 });
@@ -177,12 +212,14 @@ router.delete("/:groupId", async (req, res) => {
     res
       .status(200)
       .json({ message: "Group and associated webhooks deleted successfully." });
-  } catch (error) {
-    console.error(
-      `[DELETE /api/groups/${groupId}] Error deleting group:`,
-      error,
-    );
-    res.status(500).json({ message: "Error deleting group." });
+  } catch (err) {
+    let errorMessage = 'An unexpected error occurred while deleting the group.';
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    } else if (typeof err === 'string') {
+      errorMessage = err;
+    }
+    res.status(500).json({ message: errorMessage });
   }
 });
 
@@ -212,11 +249,22 @@ router.get("/:groupId/webhooks", async (req, res) => {
     );
     console.log(`[DEBUG] Webhooks found:`, webhooksResult.rows);
     res.json(webhooksResult.rows);
-  } catch (error) {
-    console.error(
-      `[GET /api/groups/${groupId}/webhooks] Error fetching webhooks:`,
-      error,
-    );
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(
+        `[GET /api/groups/${groupId}/webhooks] Error fetching webhooks:`,
+        err.message,
+      );
+    } else if (typeof err === 'string') {
+      console.error(
+        `[GET /api/groups/${groupId}/webhooks] Error fetching webhooks:`,
+        err,
+      );
+    } else {
+      console.error(
+        `[GET /api/groups/${groupId}/webhooks] Error fetching webhooks: An unexpected error occurred`,
+      );
+    }
     res.status(500).json({ message: "Error fetching webhooks for the group." });
   }
 });
@@ -272,11 +320,22 @@ router.post("/:groupId/webhooks", async (req, res) => {
       ...newWebhook,
       webhook_url: webhookUrl,
     });
-  } catch (error) {
-    console.error(
-      `[POST /api/groups/${groupId}/webhooks] Error creating webhook:`,
-      error,
-    );
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(
+        `[POST /api/groups/${groupId}/webhooks] Error creating webhook:`,
+        err.message,
+      );
+    } else if (typeof err === 'string') {
+      console.error(
+        `[POST /api/groups/${groupId}/webhooks] Error creating webhook:`,
+        err,
+      );
+    } else {
+      console.error(
+        `[POST /api/groups/${groupId}/webhooks] Error creating webhook: An unexpected error occurred`,
+      );
+    }
     res
       .status(500)
       .json({ message: "Internal server error creating webhook." });

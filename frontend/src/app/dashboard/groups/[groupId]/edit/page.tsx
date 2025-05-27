@@ -82,8 +82,14 @@ export default function EditGroupPage() {
             setLinkTokenInfo(null);
         }
 
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else if (typeof err === 'string') {
+          setError(err);
+        } else {
+          setError('An unexpected error occurred while loading group details.');
+        }
         setOriginalGroup(null); // On error, ensure no outdated data is displayed
       } finally {
         setIsLoadingData(false);
@@ -131,8 +137,14 @@ export default function EditGroupPage() {
         throw new Error(errorData.message || 'Error updating group');
       }
       router.push('/dashboard/groups');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while updating the group.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -158,8 +170,14 @@ export default function EditGroupPage() {
       // The page doesn't necessarily need to be reloaded immediately, as linkTokenInfo now controls the UI.
       // A reload via setRefreshKey would update originalGroup.link_token, which is good.
       setRefreshKey(prev => prev + 1); 
-    } catch (err: any) {
-      setLinkError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setLinkError(err.message);
+      } else if (typeof err === 'string') {
+        setLinkError(err);
+      } else {
+        setLinkError('An unexpected error occurred while generating the link token.');
+      }
     } finally {
       setIsLinking(false);
     }
@@ -170,7 +188,8 @@ export default function EditGroupPage() {
     if (!isoDateString) return 'N/A';
     try {
       return new Date(isoDateString).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-    } catch (e) {
+    } catch (e: unknown) {
+      console.error("Error formatting date:", e);
       return 'Invalid date';
     }
   };

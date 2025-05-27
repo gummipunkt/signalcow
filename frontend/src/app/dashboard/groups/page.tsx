@@ -50,8 +50,14 @@ export default function GroupsPage() {
           }
           const data: Group[] = await response.json();
           setGroups(data);
-        } catch (err: any) {
-          setError(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else if (typeof err === 'string') {
+            setError(err);
+          } else {
+            setError('An unexpected error occurred while fetching groups.');
+          }
         } finally {
           setIsLoading(false);
         }
@@ -83,8 +89,14 @@ export default function GroupsPage() {
 
       setGroups(prevGroups => prevGroups.filter(group => group.id !== groupId));
 
-    } catch (err: any) {
-      setDeleteError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setDeleteError(err.message);
+      } else if (typeof err === 'string') {
+        setDeleteError(err);
+      } else {
+        setDeleteError('An unexpected error occurred while deleting the group.');
+      }
     } finally {
       setIsDeleting(null);
     }
@@ -132,7 +144,7 @@ export default function GroupsPage() {
 
         {groups.length === 0 ? (
           <div className="notification is-info">
-            <p>You haven't created any groups yet.</p>
+            <p>You haven&apos;t created any groups yet.</p>
           </div>
         ) : (
           <div className="columns is-multiline">

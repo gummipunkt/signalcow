@@ -116,7 +116,7 @@ export default function LoginPage() {
           </form>
           <hr />
           <p className="has-text-centered">
-            Don't have an account yet? <Link href="/register">Register here</Link>.
+            Don&apos;t have an account yet? <Link href="/register">Register here</Link>.
           </p>
         </div>
       </div>

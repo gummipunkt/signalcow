@@ -48,8 +48,14 @@ export default function AdminWebhooksPage() {
           }
           const data: AdminWebhook[] = await response.json();
           setWebhooks(data);
-        } catch (err: any) {
-          setPageError(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setPageError(err.message);
+          } else if (typeof err === 'string') {
+            setPageError(err);
+          } else {
+            setPageError('An unexpected error occurred while fetching webhooks.');
+          }
         } finally {
           setIsLoadingData(false);
         }
@@ -77,9 +83,15 @@ export default function AdminWebhooksPage() {
       }
       setWebhooks(prevWebhooks => prevWebhooks.filter(wh => wh.id !== webhookId));
       alert('Webhook deleted successfully.');
-    } catch (err: any) {
-      setPageError(err.message);
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      let errorMessage = 'An unexpected error occurred while deleting the webhook.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      setPageError(errorMessage);
+      alert(`Error: ${errorMessage}`);
     }
   };
   

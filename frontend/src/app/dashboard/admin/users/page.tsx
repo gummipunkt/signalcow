@@ -45,8 +45,14 @@ export default function AdminUsersPage() {
           }
           const data: AdminUser[] = await response.json();
           setUsers(data);
-        } catch (err: any) {
-          setPageError(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setPageError(err.message);
+          } else if (typeof err === 'string') {
+            setPageError(err);
+          } else {
+            setPageError('An unexpected error occurred while fetching users.');
+          }
         } finally {
           setIsLoadingData(false);
         }
@@ -77,9 +83,15 @@ export default function AdminUsersPage() {
       }
       setUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
       alert('User deleted successfully.');
-    } catch (err: any) {
-      setPageError(err.message);
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      let errorMessage = 'An unexpected error occurred while deleting the user.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      setPageError(errorMessage);
+      alert(`Error: ${errorMessage}`);
     }
   };
 

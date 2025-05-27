@@ -41,8 +41,14 @@ export default function GroupWebhooksPage() {
       if (!response.ok) throw new Error('Error loading group details.');
       const data: Group = await response.json();
       setGroup(data);
-    } catch (err: any) {
-      setError(err.message); // Set error when loading group
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Set error when loading group
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while loading group details.');
+      }
     }
   }, [token, isAuthenticated, groupId]);
 
@@ -61,8 +67,14 @@ export default function GroupWebhooksPage() {
       }
       const data: Webhook[] = await response.json();
       setWebhooks(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while fetching webhooks.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -95,8 +107,14 @@ export default function GroupWebhooksPage() {
         throw new Error(errorData.message || 'Error deleting webhook');
       }
       setWebhooks(prev => prev.filter(wh => wh.id !== webhookId));
-    } catch (err: any) {
-      setDeleteError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setDeleteError(err.message);
+      } else if (typeof err === 'string') {
+        setDeleteError(err);
+      } else {
+        setDeleteError('An unexpected error occurred while deleting the webhook.');
+      }
     } finally {
       setIsDeleting(null);
     }

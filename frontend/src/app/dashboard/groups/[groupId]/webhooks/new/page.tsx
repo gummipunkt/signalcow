@@ -48,8 +48,14 @@ export default function NewWebhookPage() {
       }
       const data: Group = await response.json();
       setGroup(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while loading group details.');
+      }
     } finally {
       setIsLoadingData(false);
     }
@@ -89,8 +95,14 @@ export default function NewWebhookPage() {
       setCreatedWebhook(newWebhook);
       // Optional: Redirect to webhook overview after successful creation?
       // router.push(`/dashboard/groups/${groupId}/webhooks`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError('An unexpected error occurred while creating the webhook.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +144,7 @@ export default function NewWebhookPage() {
           </ul>
         </nav>
 
-        <h1 className="title">Create New Webhook for Group "{group?.group_name}"</h1>
+        <h1 className="title">Create New Webhook for Group &quot;{group?.group_name}&quot;</h1>
         
         {createdWebhook ? (
           <div className="box">

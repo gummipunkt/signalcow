@@ -48,8 +48,14 @@ export default function AdminGroupsPage() {
           }
           const data: AdminGroup[] = await response.json();
           setGroups(data);
-        } catch (err: any) {
-          setPageError(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setPageError(err.message);
+          } else if (typeof err === 'string') {
+            setPageError(err);
+          } else {
+            setPageError('An unexpected error occurred while fetching groups.');
+          }
         } finally {
           setIsLoadingData(false);
         }
@@ -76,9 +82,15 @@ export default function AdminGroupsPage() {
       }
       setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
       alert('Group deleted successfully.');
-    } catch (err: any) {
-      setPageError(err.message);
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      let errorMessage = 'An unexpected error occurred while deleting the group.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      setPageError(errorMessage);
+      alert(`Error: ${errorMessage}`);
     }
   };
   
