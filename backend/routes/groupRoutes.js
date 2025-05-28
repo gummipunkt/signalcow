@@ -692,7 +692,7 @@ router.post("/:groupId/webhooks", async (req, res) => {
     // 2. Generate webhook token
     const webhookToken = crypto.randomBytes(24).toString("hex");
 
-    // 3. Save webhook to DB
+    // 3. Save webhook to DB with user_id
     const newWebhookResult = await pool.query(
       "INSERT INTO webhooks (group_id, webhook_token, description, is_active) VALUES ($1, $2, $3, $4) RETURNING id, webhook_token, description, is_active, created_at",
       [groupId, webhookToken, description || null, true],
