@@ -18,6 +18,8 @@ const port = process.env.PORT || 3001;
 
 // Middleware for parsing JSON bodies (global for the app)
 app.use(express.json());
+// Middleware for parsing plain text bodies (will be used specifically or globally if needed)
+app.use(express.text()); // Potentially apply this more selectively if it causes issues elsewhere
 
 // Swagger/OpenAPI Configuration
 const swaggerOptions = {
@@ -85,9 +87,35 @@ app.use('/api/webhooks', authenticateToken, webhookRoutes); // Temporarily comme
 // Webhook execution endpoint
 app.post('/webhook/:webhookToken', async (req, res) => {
   const { webhookToken } = req.params;
-  const messageData = req.body; 
+  
+  // Temporäres Logging:
+  console.log(`Webhook ${webhookToken} called.`);
+  console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('Raw Request Body Type:', typeof req.body);
+  console.log('Raw Request Body:', JSON.stringify(req.body, null, 2));
 
-  // console.log(`Webhook ${webhookToken} called with data:`, messageData);
+  let textToSend = null;
+
+  // Check if body is a string (from express.text())
+  if (typeof req.body === 'string' && req.body.trim() !== '') {
+    textToSend = req.body.trim();
+    console.log('[Webhook] Received text/plain body:', textToSend);
+  } 
+  // Check if body is an object (from express.json()) and has text/message property
+  else if (typeof req.body === 'object' && req.body !== null) {
+    if (req.body.text && typeof req.body.text === 'string' && req.body.text.trim() !== '') {
+      textToSend = req.body.text.trim();
+      console.log('[Webhook] Received JSON body with text field:', textToSend);
+    } else if (req.body.message && typeof req.body.message === 'string' && req.body.message.trim() !== '') {
+      textToSend = req.body.message.trim();
+      console.log('[Webhook] Received JSON body with message field:', textToSend);
+    }
+  }
+
+  if (!textToSend) {
+    console.log(`Webhook ${webhookToken} called without usable text in body (checked for plain text and JSON with text/message field).`);
+    return res.status(400).json({ message: 'No message text found in request body (expected plain text or JSON with text/message field).' });
+  }
 
   try {
     const webhookResult = await pool.query(
@@ -112,12 +140,6 @@ app.post('/webhook/:webhookToken', async (req, res) => {
       return res.status(400).json({ message: 'No Signal group ID configured for this webhook.' });
     }
     
-    const textToSend = messageData.text || messageData.message;
-    if (!textToSend) {
-      console.log(`Webhook ${webhookToken} called without text/message field in body.`);
-      return res.status(400).json({ message: 'No message text (text or message field) found in request body.' });
-    }
-
     // Send message via signalService
     // The bot_phone_number from the DB is not used directly here, as signalService
     // uses the configured BOT_NUMBER. This could be adjusted if different bot numbers
