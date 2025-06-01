@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db'); // Imports the DB pool
 const crypto = require('crypto'); // Added for token generation
 const nodemailer = require('nodemailer'); // Added nodemailer
+const { authenticateToken } = require('../middleware/authMiddleware'); // Import authenticateToken
 
 // Placeholder - authentication routes will go here later
 // e.g., router.post('/register', ...);
@@ -442,6 +443,103 @@ router.post('/reset-password', async (req, res) => {
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ message: 'An internal error occurred. Please try again later.' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   post:
+ *     summary: Allows an authenticated user to change their password.
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *               - confirmNewPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's current password.
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's desired new password (min 6 characters recommended).
+ *               confirmNewPassword:
+ *                 type: string
+ *                 format: password
+ *                 description: Confirmation of the new password.
+ *     responses:
+ *       200:
+ *         description: Password changed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password changed successfully.
+ *       400:
+ *         description: Invalid input (e.g., passwords don't match, new password too short).
+ *       401:
+ *         description: Unauthorized (e.g., token missing or invalid, or current password incorrect).
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/change-password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword, confirmNewPassword } = req.body;
+  const userId = req.user.id; // Extracted from JWT by authenticateToken middleware
+
+  if (!currentPassword || !newPassword || !confirmNewPassword) {
+    return res.status(400).json({ message: 'Current password, new password, and confirmation are required.' });
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    return res.status(400).json({ message: 'New passwords do not match.' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+  }
+
+  try {
+    // Fetch the user's current hashed password from the database
+    const userResult = await pool.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+
+    if (userResult.rows.length === 0) {
+      // This should not happen if authenticateToken works correctly and user exists
+      return res.status(404).json({ message: 'User not found.' }); 
+    }
+
+    const user = userResult.rows[0];
+
+    // Verify the current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect current password.' });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // Update the password in the database
+    await pool.query('UPDATE users SET password_hash = $1, updated_at = current_timestamp WHERE id = $2', [newPasswordHash, userId]);
+
+    res.status(200).json({ message: 'Password changed successfully.' });
+
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'An internal error occurred while changing the password.' });
   }
 });
 

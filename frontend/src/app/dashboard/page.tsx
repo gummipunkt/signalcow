@@ -206,17 +206,28 @@ export default function DashboardPage() {
         </div>
         {user?.is_admin && (
           <div className="column is-one-third">
-            <div className="box has-text-centered" style={{ backgroundColor: 'var(--pastel-yellow)', minHeight: '150px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="box has-text-centered" style={{ backgroundColor: 'var(--pastel-orange)', minHeight: '150px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <p className="title is-4" style={{ color: 'var(--text-color)' }}>Admin Panel</p>
-                <p className="subtitle is-6" style={{ color: 'var(--text-color-light)' }}>Access administrative tools.</p>
+                <p className="title is-4" style={{ color: 'var(--text-color)' }}>Admin Area</p>
+                <p className="subtitle is-6" style={{ color: 'var(--text-color-light)' }}>Manage users and system settings.</p>
               </div>
               <Link href="/dashboard/admin" className="button is-primary mt-3" style={{ backgroundColor: 'var(--pastel-lilac)', borderColor: 'var(--pastel-lilac)' }}>
-                Admin Area
+                Go to Admin
               </Link>
             </div>
           </div>
         )}
+        <div className="column is-one-third">
+          <div className="box has-text-centered" style={{ backgroundColor: 'var(--pastel-yellow)', minHeight: '150px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <p className="title is-4" style={{ color: 'var(--text-color)' }}>Settings</p>
+              <p className="subtitle is-6" style={{ color: 'var(--text-color-light)' }}>Change your password and other settings.</p>
+            </div>
+            <Link href="/dashboard/settings" className="button is-primary mt-3" style={{ backgroundColor: 'var(--pastel-lilac)', borderColor: 'var(--pastel-lilac)' }}>
+              User Settings
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
