@@ -45,7 +45,8 @@ export default function RootLayout({
                 <strong>SignalCow</strong>
                 <span style={{ marginLeft: '5px', marginRight: '5px' }}>by</span> 
                 <a href="https://gummipunkt.eu" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold' }}>gummipunkt</a>. The source code is licensed
-                <a href="https://opensource.org/license/gpl-3-0" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold', marginLeft: '5px' }}>GPL 3.0</a>.
+                <a href="https://opensource.org/license/gpl-3-0" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold', marginLeft: '5px' }}>GPL 3.0</a>. Source code at Github 
+                <a href="https://github.com/gummipunkt/signalcow" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold', marginLeft: '5px' }}>GPL 3.0</a>.
               </p>
             </div>
           </footer>

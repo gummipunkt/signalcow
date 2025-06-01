@@ -118,6 +118,9 @@ export default function LoginPage() {
           <p className="has-text-centered">
             Don&apos;t have an account yet? <Link href="/register">Register here</Link>.
           </p>
+          <p className="has-text-centered mt-2">
+            <Link href="/forgot-password">Forgot password?</Link>
+          </p>
         </div>
       </div>
     </section>
