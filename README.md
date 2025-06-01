@@ -70,47 +70,54 @@ signalcow/
         *   Set `BOT_NUMBER` to the phone number your `signal-cli` instance is using (e.g., `+1234567890`).
         *   Set `SIGNAL_CLI_REST_API_URL` (e.g., `http://localhost:8080` if `signal-cli` runs on the same machine with default port, or the appropriate URL if `signal-cli` uses a different port or host, like `http://localhost:7446` if using the port from the `signal-cli.service.example`).
         *   Set `BASE_URL` for constructing webhook URLs (e.g., `http://yourdomain.com` or `http://localhost:PORT_YOUR_BACKEND_RUNS_ON`).
-    *   **Database Setup (PostgreSQL):**
-        *   Ensure you have a PostgreSQL server installed and running.
-        *   You need to create a dedicated database and a user for the application. You can do this using `psql` or a database management tool.
-            *   Example using `psql` (connect as a superuser, e.g., `postgres`):
-                ```sql
-                -- Connect to PostgreSQL
-                -- sudo -u postgres psql
+        *   Set `FRONTEND_BASE_URL` (e.g., `http://localhost:3000` or your frontend's public URL) - this is used for generating links in password reset emails.
+        *   **Email (SMTP) Configuration (for Password Reset):**
+            *   `SMTP_HOST`: Hostname of your SMTP server (e.g., `smtp.example.com`).
+            *   `SMTP_PORT`: Port for your SMTP server (e.g., `587` for TLS, `465` for SSL).
+            *   `SMTP_USER`: Username for SMTP authentication (e.g., `user@example.com`).
+            *   `SMTP_PASS`: Password for SMTP authentication.
+            *   `SMTP_FROM_EMAIL`: The "From" address for password reset emails (e.g., `"SignalCow Password Reset" <noreply@example.com>`).
+        *   **Database Setup (PostgreSQL):**
+            *   Ensure you have a PostgreSQL server installed and running.
+            *   You need to create a dedicated database and a user for the application. You can do this using `psql` or a database management tool.
+                *   Example using `psql` (connect as a superuser, e.g., `postgres`):
+                    ```sql
+                    -- Connect to PostgreSQL
+                    -- sudo -u postgres psql
 
-                CREATE DATABASE signalbot_db;
-                CREATE USER signalbot_user WITH PASSWORD 'your_secure_password';
-                GRANT ALL PRIVILEGES ON DATABASE signalbot_db TO signalbot_user;
-                -- Optionally, if you want the user to be able to create tables etc. within a specific schema or the public schema:
-                -- \c signalbot_db
-                -- GRANT ALL ON SCHEMA public TO signalbot_user;
-                ```
-            *   Make sure the `DATABASE_URL` in your `backend/.env` file matches the database name, user, password, host, and port you configured.
-    *   **Run Database Migrations:**
-        *   Once the database is created and the `.env` file is configured, navigate to the `backend/` directory (if not already there).
-        *   Run the following command to create the necessary tables and schema in your database:
-            ```bash
-            npm run migrate up
-            ```
-        *   This command uses `node-pg-migrate` and executes the migration files located in the project\'s root `migrations/` directory (e.g., `migrations/001_initial_schema.js`). This step is essential for the application to function correctly.
-        *   **Troubleshooting Migrations:**
-            *   **Naming Convention:** `node-pg-migrate` works best when migration files start with a timestamp (e.g., `1622548800000_initial_schema.js`). To generate a new migration file with the correct naming convention, use:
+                    CREATE DATABASE signalbot_db;
+                    CREATE USER signalbot_user WITH PASSWORD 'your_secure_password';
+                    GRANT ALL PRIVILEGES ON DATABASE signalbot_db TO signalbot_user;
+                    -- Optionally, if you want the user to be able to create tables etc. within a specific schema or the public schema:
+                    -- \c signalbot_db
+                    -- GRANT ALL ON SCHEMA public TO signalbot_user;
+                    ```
+                *   Make sure the `DATABASE_URL` in your `backend/.env` file matches the database name, user, password, host, and port you configured.
+        *   **Run Database Migrations:**
+            *   Once the database is created and the `.env` file is configured, navigate to the `backend/` directory (if not already there).
+            *   Run the following command to create the necessary tables and schema in your database:
                 ```bash
-                npm run migrate:create descriptive_migration_name
+                npm run migrate up
                 ```
-                Then, add your schema changes to the `up` (and `down`) functions in the newly generated file.
-            *   **`Can't determine timestamp` or `No migrations to run!` errors:** This often indicates an issue with the migration filename not matching the expected format, or `node-pg-migrate` thinking a migration has already run (check the `pgmigrations` table in your database). Renaming the file to include a timestamp or creating a new one as described above usually resolves this. You can inspect the `pgmigrations` table in your database (e.g., `SELECT * FROM pgmigrations;` in `psql`) to see which migrations `node-pg-migrate` considers applied.
-            *   **`MODULE_TYPELESS_PACKAGE_JSON` Warning:** You might see a Node.js warning about module types if your migration file uses ES Module syntax but your `backend/package.json` does not specify `"type": "module"`. As long as the migration completes successfully, this warning can often be ignored. To resolve it, ensure your migration files use CommonJS syntax (e.g., `exports.up = ...`) or add `"type": "module"` to `backend/package.json` (this will affect all `.js` files in the backend project).
-            *   **Verify Schema:** After running `npm run migrate up` successfully, it is crucial to connect to your PostgreSQL database (e.g., using `psql`) and verify that the tables and columns were created as expected. For example:
-                ```bash
-                # Connect to your database, then:
-                \dt # List all tables
-                \d users # Describe the 'users' table to check its columns
-                \d groups # Describe the 'groups' table
-                # etc. for other tables
-                ```
-    *   Start the backend server: `npm start`
-        *   The backend typically runs on `http://localhost:3000` or the port specified in your `.env` (e.g., via a `PORT` variable if your `server.js` uses it). Check your terminal output and `.env` configuration.
+            *   This command uses `node-pg-migrate` and executes the migration files located in the project\'s root `migrations/` directory (e.g., `migrations/001_initial_schema.js`). This step is essential for the application to function correctly.
+            *   **Troubleshooting Migrations:**
+                *   **Naming Convention:** `node-pg-migrate` works best when migration files start with a timestamp (e.g., `1622548800000_initial_schema.js`). To generate a new migration file with the correct naming convention, use:
+                    ```bash
+                    npm run migrate:create descriptive_migration_name
+                    ```
+                    Then, add your schema changes to the `up` (and `down`) functions in the newly generated file.
+                *   **`Can't determine timestamp` or `No migrations to run!` errors:** This often indicates an issue with the migration filename not matching the expected format, or `node-pg-migrate` thinking a migration has already run (check the `pgmigrations` table in your database). Renaming the file to include a timestamp or creating a new one as described above usually resolves this. You can inspect the `pgmigrations` table in your database (e.g., `SELECT * FROM pgmigrations;` in `psql`) to see which migrations `node-pg-migrate` considers applied.
+                *   **`MODULE_TYPELESS_PACKAGE_JSON` Warning:** You might see a Node.js warning about module types if your migration file uses ES Module syntax but your `backend/package.json` does not specify `"type": "module"`. As long as the migration completes successfully, this warning can often be ignored. To resolve it, ensure your migration files use CommonJS syntax (e.g., `exports.up = ...`) or add `"type": "module"` to `backend/package.json` (this will affect all `.js` files in the backend project).
+                *   **Verify Schema:** After running `npm run migrate up` successfully, it is crucial to connect to your PostgreSQL database (e.g., using `psql`) and verify that the tables and columns were created as expected. For example:
+                    ```bash
+                    # Connect to your database, then:
+                    \dt # List all tables
+                    \d users # Describe the 'users' table to check its columns
+                    \d groups # Describe the 'groups' table
+                    # etc. for other tables
+                    ```
+        *   Start the backend server: `npm start`
+            *   The backend typically runs on `http://localhost:3000` or the port specified in your `.env` (e.g., via a `PORT` variable if your `server.js` uses it). Check your terminal output and `.env` configuration.
 
 3.  **Frontend Setup (`frontend/`):**
     *   Navigate to the `frontend` directory: `cd ../frontend` (from `backend/`) or `cd frontend` (from project root).
@@ -154,6 +161,9 @@ All API endpoints are prefixed with `/api`. Authentication is required for most 
 *   **Auth:**
     *   `POST /auth/register`
     *   `POST /auth/login`
+    *   `POST /auth/forgot-password`
+    *   `POST /auth/reset-password`
+    *   `POST /auth/change-password` (Authenticated users)
 *   **Groups (User-specific):**
     *   `GET /groups` (Lists groups for the authenticated user)
     *   `POST /groups` (Creates a new group)
