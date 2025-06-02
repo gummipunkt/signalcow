@@ -190,7 +190,7 @@ All API endpoints are prefixed with `/api`. Authentication is required for most 
 
 The backend provides an interactive API documentation using Swagger UI. This allows you to explore and test the API endpoints directly from your browser.
 
-*   **Accessing Swagger UI:** Once the backend server is running, you can access the Swagger UI at the `/api-docs` endpoint. For example, if your backend is running on `http://localhost:3001`, the Swagger UI will be available at `http://localhost:3001/api-docs`.
+*   **Accessing Swagger UI:** Once the backend server is running, you can access the Swagger UI at the `/api-docs/` endpoint. For example, if your backend is running on `http://localhost:3001`, the Swagger UI will be available at `http://localhost:3001/api-docs/`.
 *   **Features:**
     *   View all available API endpoints, including those for authentication, group management, webhook management, and admin functionalities.
     *   See details for each endpoint, including required parameters, request body structure, and possible responses.
