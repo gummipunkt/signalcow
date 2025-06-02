@@ -32,7 +32,7 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/.pnpm-debug.log*
-frontend/*.tsbuildinfo
+frontend/*.tsbuildinfocd
 # next-env.d.ts is often committed, but if you prefer to ignore: 
 # frontend/next-env.d.ts
 
