@@ -2,17 +2,17 @@ name: Node.js CI with Gulp
 
 on:
   push:
-    branches: [ main ] # Triggers the workflow on push events to the main branch
+    branches: [ main ]
   pull_request:
-    branches: [ main ] # Triggers the workflow on pull request events to the main branch
+    branches: [ main ]
 
 jobs:
-  build_and_test: # Job name
-    runs-on: ubuntu-latest # Defines the type of runner
+  build_and_test:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 21.x, 22.x] # Runs the job for different Node.js versions
+        node-version: [18.x, 20.x, 21.x, 22.x]
 
     steps:
     - name: Checkout repository
