@@ -36,7 +36,7 @@ gulp.task('lint:backend', () => {
     `!${backendDir}/gulpfile.js`,
     `!${backendDir}/migrations/**`
   ])
-    .pipe(eslint({ configFile: path.join(backendDir, '.eslintrc.js') }))
+    .pipe(eslint({ overrideConfigFile: path.join(backendDir, '.eslintrc.js') }))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
