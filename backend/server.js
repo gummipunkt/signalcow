@@ -32,8 +32,8 @@ const swaggerOptions = {
     },
     servers: [ // Optional: Define your server URL
       {
-        url: `http://localhost:${port}`, // Adjust if your server runs elsewhere or on HTTPS
-        description: 'Development server'
+        url: process.env.BASE_URL || `http://localhost:${port}`,
+        description: process.env.BASE_URL ? 'Production/Configured Server' : 'Development server (localhost)'
       }
     ],
     // Optional: Add components like securitySchemes for JWT
