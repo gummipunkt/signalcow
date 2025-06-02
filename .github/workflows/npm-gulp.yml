@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x] # Runs the job for different Node.js versions
+        node-version: [18.x, 20.x, 21.x, 22.x] # Runs the job for different Node.js versions
 
     steps:
     - name: Checkout repository
