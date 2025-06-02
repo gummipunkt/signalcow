@@ -1,5 +1,5 @@
 ---
-name: Gulp CI
+name: Node.js CI with Gulp
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
     branches:
       - main
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,3 +34,14 @@ jobs:
       - name: Install Frontend Dependencies
         working-directory: ./frontend
         run: npm ci
+      - name: Run Frontend Build via Gulp
+        working-directory: ./backend
+        run: npx gulp build:frontend
+      - name: Run Linter
+        working-directory: ./backend
+        run: npx gulp lint
+      - name: Upload Frontend Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ matrix.node-version }}
+          path: frontend/.next/
