@@ -23,7 +23,8 @@
     "pg": "^8.16.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "nodemailer": "^7.0.3"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",

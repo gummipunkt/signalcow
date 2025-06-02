@@ -39,11 +39,10 @@ export default function Home() {
             Signalcow
           </h1>
           <h2 className={`subtitle is-3 ${styles.subtitle}`}>
-            Your intelligent assistant for automating Signal interactions and notification management.
+            Your Signalbot for creating webhooks. My name is Torino.
           </h2>
           <p className={` ${styles.description}`}>
-            Connect your systems, create webhooks, and let Signalcow handle communication for you.
-            Manage groups, messages, and much more via an intuitive admin interface.
+            Please be careful, this service is an early alpha, join the <a href="https://github.com/gummipunkt/signalcow">Github repo</a> to get updates.
           </p>
         </div>
       </div>
