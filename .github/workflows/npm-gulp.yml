@@ -39,7 +39,7 @@ jobs:
         run: npx gulp build:frontend
       - name: Run Linter
         working-directory: ./backend
-        run: npx gulp lint
+        run: npx gulp lint:backend
       - name: Upload Frontend Build Artifact
         uses: actions/upload-artifact@v4
         with:

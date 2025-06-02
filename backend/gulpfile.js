@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
 const shell = require('gulp-shell');
 const path = require('path'); // Added for path resolution
+const eslint = require('gulp-eslint-new'); // For ESLint task
 
 const backendDir = __dirname;
 const frontendDir = path.join(__dirname, '../frontend');
@@ -25,6 +26,21 @@ gulp.task('migrate:up', shell.task('npm run migrate:up', { cwd: backendDir }));
 // Ensures the command is run in the backend directory
 gulp.task('migrate:down', shell.task('npm run migrate:down', { cwd: backendDir }));
 
+// --- Linting Task ---
+gulp.task('lint:backend', () => {
+  // Ensure you have an ESLint configuration file (e.g., .eslintrc.js) in the backend directory
+  // Adjust the src glob pattern as needed, excluding node_modules, this gulpfile, and migrations
+  return gulp.src([
+    `${backendDir}/**/*.js`,
+    `!${backendDir}/node_modules/**`,
+    `!${backendDir}/gulpfile.js`,
+    `!${backendDir}/migrations/**`
+  ])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
 // --- Frontend Tasks ---
 
 // Task to start the Next.js development server for the frontend
@@ -42,18 +58,22 @@ gulp.task('build:frontend', shell.task('npm run build', { cwd: frontendDir }));
 // Task to start the frontend production server
 gulp.task('start:frontend', shell.task('npm run start', { cwd: frontendDir }));
 
+// --- Combined Tasks ---
+
 // Default task: Starts only the backend server (to keep it simple)
 gulp.task('default', gulp.series('serve:backend'));
 
 // Development task: Starts both backend and frontend development servers in parallel
-// Note: `gulp.parallel` runs tasks concurrently.
-gulp.task('dev', gulp.parallel('serve:backend', 'serve:frontend'));
+// It also runs backend linting first.
+// If linting fails, a Gulp error will prevent subsequent tasks in the series from running.
+gulp.task('dev', gulp.series('lint:backend', gulp.parallel('serve:backend', 'serve:frontend')));
 
 console.log("Gulpfile loaded. Available tasks:");
 console.log("- gulp default: Starts the backend server with Nodemon.");
 console.log("- gulp serve:backend: Starts the backend server with Nodemon.");
+console.log("- gulp lint:backend: Lints backend JavaScript files.");
 console.log("- gulp serve:frontend: Starts the Next.js frontend dev server.");
-console.log("- gulp dev: Starts backend and frontend dev servers in parallel.");
+console.log("- gulp dev: Lints backend, then starts backend and frontend dev servers.");
 console.log("- gulp migrate:up: Runs database migrations (up).");
 console.log("- gulp migrate:down: Runs database migrations (down).");
 console.log("- gulp build:frontend: Builds the frontend for production.");
