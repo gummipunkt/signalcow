@@ -1,0 +1,65 @@
+name: Gulp CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 21.x, 22.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Action to check out your repository code
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm' # Enables caching of npm dependencies
+        cache-dependency-path: | # Paths to lock files for precise caching
+          backend/package-lock.json
+          frontend/package-lock.json
+
+    - name: Install Backend Dependencies
+      working-directory: ./backend # Changes to the backend directory
+      run: npm ci # 'npm ci' is often faster and more reliable for CI than 'npm install'
+
+    - name: Install Frontend Dependencies
+      working-directory: ./frontend # Changes to the frontend directory
+      run: npm ci
+
+    # To run Gulp tasks, Gulp is needed.
+    # Since 'gulp' is likely a devDependency in backend/package.json,
+    # we can use 'npx gulp <task>'.
+
+    - name: Run Frontend Build via Gulp
+      working-directory: ./backend # The Gulpfile is located in the backend directory
+      run: npx gulp build:frontend # Executes the Gulp task 'build:frontend'
+
+
+     - name: Run Linter (via Gulp)
+       working-directory: ./backend
+       run: npx gulp lint # Replace 'lint' with your actual lint task
+
+     - name: Run Backend Tests
+       working-directory: ./backend
+       run: npm test # Or your specific test command
+    
+     - name: Run Frontend Tests
+       working-directory: ./frontend
+       run: npm test # Or your specific test command
+
+     - name: Upload Frontend Build Artifact
+       uses: actions/upload-artifact@v4
+       with:
+         name: frontend-build-${{ matrix.node-version }} # Unique name for the artifact
+         path: frontend/.next/ # Path to Next.js build directory
