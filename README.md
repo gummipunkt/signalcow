@@ -1,11 +1,11 @@
 # Signalcow Webhook Platform
-
+![The Cow That Makes You Happy. And Webhooks.](frontend/public/signalcow.svg)
 This project provides a web-based platform to create, manage and interact with Webhooks for Signal. It allows users to register, create groups, and configure webhooks to send messages to groups via signal-cli. The first registered user automatically gains administrative privileges to manage users, groups, and webhooks directly within the frontend interface.
 Automatic Signal group linking, there's no need for a difficult solution.
 
 ## WARNING
 
-This service is an early alpha, everything can happen and break. There's no guarantee that it's safe, stable or something else.
+**This service is an early alpha, everything can happen and break. There's no guarantee that it's safe, stable or something else.**
 
 ## Core Features
 
