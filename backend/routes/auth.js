@@ -305,7 +305,7 @@ router.post('/forgot-password', async (req, res) => {
       // Send email using Nodemailer
       const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_EMAIL, FRONTEND_BASE_URL } = process.env;
 
-      if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !SMTP_FROM_EMAIL || !FRONTEND_BASE_URL) {
+      if (!SMTP_HOST || !SMTP_PORT || !SMTP_FROM_EMAIL || !FRONTEND_BASE_URL) {
         console.error('SMTP configuration or FRONTEND_BASE_URL is missing in .env file. Cannot send password reset email.');
         // Do not expose this error to the client for security, but log it.
         // The generic success message will still be sent.
@@ -315,10 +315,12 @@ router.post('/forgot-password', async (req, res) => {
             host: SMTP_HOST,
             port: parseInt(SMTP_PORT, 10),
             secure: parseInt(SMTP_PORT, 10) === 465, // true for 465, false for other ports
-            auth: {
-              user: SMTP_USER,
-              pass: SMTP_PASS,
-            },
+            ...(SMTP_USER && SMTP_PASS ? {
+              auth: {
+                user: SMTP_USER,
+                pass: SMTP_PASS,
+              }
+            } : {})
           });
 
           const resetLink = `${FRONTEND_BASE_URL}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;

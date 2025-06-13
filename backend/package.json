@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.28.0",
     "gulp": "^5.0.1",
     "gulp-eslint-new": "^2.4.0",
     "gulp-nodemon": "^2.5.0",

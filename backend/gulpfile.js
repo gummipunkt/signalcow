@@ -25,7 +25,7 @@ gulp.task('migrate:up', shell.task('npm run migrate:up', { cwd: backendDir }));
 // Task to run database migrations (down)
 // Ensures the command is run in the backend directory
 gulp.task('migrate:down', shell.task('npm run migrate:down', { cwd: backendDir }));
-
+https://www.spiegel.de/
 // --- Linting Task ---
 gulp.task('lint:backend', () => {
   // Ensure you have an ESLint configuration file (e.g., .eslintrc.js) in the backend directory

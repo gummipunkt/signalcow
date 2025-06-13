@@ -1,7 +1,7 @@
 // 'use client'; // No longer needed at this level
 
 import type { Metadata } from "next";
-// import Link from 'next/link'; // No longer directly needed here
+import Link from 'next/link';
 import { Inter } from "next/font/google";
 import "./globals.css";
 import 'bulma/css/bulma.min.css';
@@ -40,7 +40,7 @@ export default function RootLayout({
           <main>{children}</main>
           <footer className="footer" style={{ backgroundColor: 'var(--pastel-light-lilac)', paddingTop: '2rem', paddingBottom: '2rem' }}>
             <div className="content has-text-centered">
-              <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--text-color)' }}>
+              <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--text-color)', marginBottom: '1rem' }}>
                 <Image src="/signalcow.svg" alt="Signalcow Logo" width={24} height={24} style={{ marginRight: '8px' }} /> 
                 <strong>SignalCow</strong>
                 <span style={{ marginLeft: '5px', marginRight: '5px' }}>by</span> 
@@ -48,6 +48,14 @@ export default function RootLayout({
                 <a href="https://opensource.org/license/gpl-3-0" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold', marginLeft: '5px' }}>GPL 3.0</a>. Source code at Github 
                 <a href="https://github.com/gummipunkt/signalcow" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold', marginLeft: '5px' }}>GPL 3.0</a>.
               </p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', color: 'var(--text-color)' }}>
+                <Link href="/impressum" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold' }}>
+                  Legal Notice
+                </Link>
+                <Link href="/privacy" style={{ color: 'var(--pastel-lilac)', fontWeight: 'bold' }}>
+                  Privacy Policy
+                </Link>
+              </div>
             </div>
           </footer>
         </AuthProvider>
